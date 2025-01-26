@@ -3,6 +3,7 @@ package deferhelper
 import (
 	"bufio"
 	"io"
+	"time"
 
 	"github.com/solsw/errorhelper"
 )
@@ -11,7 +12,7 @@ import (
 // from a [defer] statement at the very beginning of a function,
 //
 //		func Example() {
-//		  defer BeforeAfter(before(), after())()
+//		  defer deferhelper.BeforeAfter(before(), after())()
 //	    // do something
 //		}
 //
@@ -65,6 +66,29 @@ func WriteStringBeforeAfter(w io.Writer, before, after string) func() {
 				_ = errorhelper.Must(bw.WriteString(after))
 				errorhelper.Must0(bw.Flush())
 			}
+		},
+	)
+}
+
+// DurationBeforeAfter, if called in the following manner
+// from a [defer] statement at the very beginning of a function,
+//
+//		func Example(d *time.Duration) {
+//		  defer deferhelper.DurationBeforeAfter(d)()
+//	    // do something
+//		}
+//
+// will assign the duration of function Example execution to 'd'.
+//
+// [defer]: https://go.dev/ref/spec#Defer_statements
+func DurationBeforeAfter(d *time.Duration) func() {
+	var startTime time.Time
+	return BeforeAfter(
+		func() {
+			startTime = time.Now()
+		},
+		func() {
+			*d = time.Since(startTime)
 		},
 	)
 }

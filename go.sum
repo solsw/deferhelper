@@ -1,2 +1,4 @@
-github.com/solsw/errorhelper v0.5.0 h1:FqhnLBWykGqi8p9N8ZLRn9BM4qEipKK4TATeFFZ9hBI=
-github.com/solsw/errorhelper v0.5.0/go.mod h1:TL2sAPp7jzFoajz+/yDeeVCfY0La+aIX/+JCvdBJ3WY=
+github.com/solsw/errorhelper v0.8.2 h1:0q3mSD7oHY6SQ/x8D/W3+bqeVTtAhCqw8k4jBc2AoU8=
+github.com/solsw/errorhelper v0.8.2/go.mod h1:Brc0aExJO9MBI7UEHpo7VDEOdPj1eU6GO6qR1CnJV84=
+github.com/solsw/runtimehelper v0.2.0 h1:lxkQiD6lKWZti1S830Ee6qSUavaCb81SWJI+0hrXios=
+github.com/solsw/runtimehelper v0.2.0/go.mod h1:86mFcvL3sela4Eiiq4/WezGLE2IoMMVlfZT52cUImjQ=
