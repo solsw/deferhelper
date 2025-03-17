@@ -15,10 +15,15 @@ func ExampleBeforeAfter() {
 }
 
 func ExampleWriteStringBeforeAfter() {
+	defer WriteStringBeforeAfter(os.Stdout, "", "")()
+	defer WriteStringBeforeAfter(os.Stdout, "only before\n", "")()
 	defer WriteStringBeforeAfter(os.Stdout, "before\n", "after\n")()
+	defer WriteStringBeforeAfter(os.Stdout, "", "only after\n")()
 	fmt.Println("in the middle")
 	// Output:
+	// only before
 	// before
 	// in the middle
+	// only after
 	// after
 }

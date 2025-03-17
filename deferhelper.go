@@ -3,8 +3,6 @@ package deferhelper
 import (
 	"bufio"
 	"io"
-
-	"github.com/solsw/errorhelper"
 )
 
 // BeforeAfter, if called in the following manner
@@ -35,12 +33,16 @@ func WriteBeforeAfter(w io.Writer, before, after []byte) func() {
 	return BeforeAfter(
 		func() {
 			if len(before) > 0 {
-				_ = errorhelper.Must(w.Write(before))
+				if _, err := w.Write(before); err != nil {
+					panic(err)
+				}
 			}
 		},
 		func() {
 			if len(after) > 0 {
-				_ = errorhelper.Must(w.Write(after))
+				if _, err := w.Write(after); err != nil {
+					panic(err)
+				}
 			}
 		},
 	)
@@ -56,14 +58,22 @@ func WriteStringBeforeAfter(w io.Writer, before, after string) func() {
 	return BeforeAfter(
 		func() {
 			if before != "" {
-				_ = errorhelper.Must(bw.WriteString(before))
-				errorhelper.Must0(bw.Flush())
+				if _, err := bw.WriteString(before); err != nil {
+					panic(err)
+				}
+				if err := bw.Flush(); err != nil {
+					panic(err)
+				}
 			}
 		},
 		func() {
 			if after != "" {
-				_ = errorhelper.Must(bw.WriteString(after))
-				errorhelper.Must0(bw.Flush())
+				if _, err := bw.WriteString(after); err != nil {
+					panic(err)
+				}
+				if err := bw.Flush(); err != nil {
+					panic(err)
+				}
 			}
 		},
 	)
