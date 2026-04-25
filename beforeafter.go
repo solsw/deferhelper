@@ -1,7 +1,6 @@
 package deferhelper
 
 import (
-	"bufio"
 	"io"
 )
 
@@ -26,7 +25,11 @@ func BeforeAfter(before, after func()) func() {
 
 // WriteBeforeAfter is like [BeforeAfter] but writes 'before' and
 // 'after' slices to 'w' before and after executing the function code.
+// It panics if a write to 'w' fails.
 func WriteBeforeAfter(w io.Writer, before, after []byte) func() {
+	if w == nil {
+		panic("deferhelper: nil writer")
+	}
 	if len(before) == 0 && len(after) == 0 {
 		return func() {}
 	}
@@ -48,33 +51,8 @@ func WriteBeforeAfter(w io.Writer, before, after []byte) func() {
 	)
 }
 
-// WriteStringBeforeAfter is like [BeforeAfter] but writes 'before' and
-// 'after' strings to 'w' before and after executing the function code.
+// WriteStringBeforeAfter is like [WriteBeforeAfter] but accepts strings.
+// It panics if a write to 'w' fails.
 func WriteStringBeforeAfter(w io.Writer, before, after string) func() {
-	if before == "" && after == "" {
-		return func() {}
-	}
-	bw := bufio.NewWriter(w)
-	return BeforeAfter(
-		func() {
-			if before != "" {
-				if _, err := bw.WriteString(before); err != nil {
-					panic(err)
-				}
-				if err := bw.Flush(); err != nil {
-					panic(err)
-				}
-			}
-		},
-		func() {
-			if after != "" {
-				if _, err := bw.WriteString(after); err != nil {
-					panic(err)
-				}
-				if err := bw.Flush(); err != nil {
-					panic(err)
-				}
-			}
-		},
-	)
+	return WriteBeforeAfter(w, []byte(before), []byte(after))
 }
