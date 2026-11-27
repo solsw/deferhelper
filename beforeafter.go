@@ -4,23 +4,17 @@ import (
 	"io"
 )
 
-// BeforeAfter, if called in the following manner
-// from a [defer] statement at the very beginning of a function,
+// BeforeAfter calls before immediately and returns after. Use it in a [defer]
+// statement to run after when the enclosing function exits:
 //
-//		func Example() {
-//		  defer deferhelper.BeforeAfter(before(), after())()
-//	    // do something
-//		}
+//	defer deferhelper.BeforeAfter(before, after)()
 //
-// will call 'before' function before executing the function code
-// and 'after' function after executing the function code.
+// When deferred this way, after can call recover directly to handle a panic.
 //
 // [defer]: https://go.dev/ref/spec#Defer_statements
 func BeforeAfter(before, after func()) func() {
 	before()
-	return func() {
-		after()
-	}
+	return after
 }
 
 // WriteBeforeAfter is like [BeforeAfter] but writes 'before' and

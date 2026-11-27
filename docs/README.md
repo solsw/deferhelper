@@ -3,9 +3,8 @@
 [![GitHub](https://img.shields.io/badge/github--green?logo=github)](https://github.com/solsw/deferhelper)
 
 Package `deferhelper` contains helpers for Go's
-[defer](https://go.dev/ref/spec#Defer_statements) statement. They let a single
-deferred call run one action **before** the enclosing function body and another
-**after** it returns — a convenient pattern for tracing, logging and setup/teardown.
+[defer](https://go.dev/ref/spec#Defer_statements) statement. Use them to pair
+setup with cleanup or to trace function entry and exit.
 
 ## Installation
 
@@ -19,21 +18,19 @@ import "github.com/solsw/deferhelper"
 
 ## How it works
 
-`defer` evaluates its arguments immediately but runs the deferred call when the
-function returns. [`BeforeAfter`](https://github.com/solsw/deferhelper/blob/main/beforeafter.go)
-exploits this: it takes a `before` and an `after` function, calls `before` right
-away (while the arguments are being evaluated), and returns a closure that calls
-`after`. Deferring that closure — and calling it — schedules `after` for
-function exit:
+When execution reaches the `defer` statement below, `BeforeAfter` calls
+`before` immediately and returns `after`. The trailing `()` makes `after()`
+the deferred call.
 
 ```go
-func Example() {
+func work(before, after func()) {
     defer deferhelper.BeforeAfter(before, after)()
     // do something
 }
 ```
 
-Note the trailing `()`: `BeforeAfter` returns the function that `defer` will run.
+`after` runs when `work` returns or a panic unwinds it. Because `after` is
+itself deferred, it can call `recover()` directly to handle the panic.
 
 ## Functions
 
@@ -43,8 +40,8 @@ Note the trailing `()`: `BeforeAfter` returns the function that `defer` will run
 | [`WriteBeforeAfter`](https://github.com/solsw/deferhelper/blob/main/beforeafter.go) | `WriteBeforeAfter(w io.Writer, before, after []byte) func()` | write `before`/`after` byte slices to `w` around the body |
 | [`WriteStringBeforeAfter`](https://github.com/solsw/deferhelper/blob/main/beforeafter.go) | `WriteStringBeforeAfter(w io.Writer, before, after string) func()` | like `WriteBeforeAfter` but takes strings |
 
-`WriteBeforeAfter` and `WriteStringBeforeAfter` panic if the write to `w` fails,
-and `WriteBeforeAfter` panics if `w` is `nil`. Empty `before`/`after` values
+`WriteBeforeAfter` and `WriteStringBeforeAfter` both panic if `w` is `nil`
+or a write fails. Empty `before`/`after` values
 produce no write.
 
 ## Usage

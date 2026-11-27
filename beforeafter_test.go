@@ -3,7 +3,23 @@ package deferhelper
 import (
 	"fmt"
 	"os"
+	"testing"
 )
+
+func TestBeforeAfterRecover(t *testing.T) {
+	const want = "panic in body"
+	defer func() {
+		if escaped := recover(); escaped != nil {
+			t.Errorf("panic escaped after callback: %v", escaped)
+		}
+	}()
+	defer BeforeAfter(func() {}, func() {
+		if got := recover(); got != want {
+			t.Errorf("after recovered %v, want %q", got, want)
+		}
+	})()
+	panic(want)
+}
 
 func ExampleBeforeAfter() {
 	defer BeforeAfter(func() { fmt.Println("before") }, func() { fmt.Println("after") })()
